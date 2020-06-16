@@ -3,3 +3,5 @@
 //
 
 #import "OscillatorOBJC.h"
+#import "WaveFormOBJC.h"
+#import "SynthOBJC.h"
