@@ -3,6 +3,12 @@ import UIKit
 
 class SynthViewController: UIViewController {
     
+    enum Language: Int {
+        case swift, objc
+    }
+    
+    private var languageSelected = Language.swift
+    
     private lazy var parameterLabel: UILabel = {
         let label = UILabel()
         label.textColor = .white
@@ -25,6 +31,20 @@ class SynthViewController: UIViewController {
         segmentedControl.selectedSegmentTintColor = .interactiveColor
         segmentedControl.translatesAutoresizingMaskIntoConstraints = false
 		
+        return segmentedControl
+    }()
+    
+    private lazy var languageSelectorSegmentedControl: UISegmentedControl = {
+        var languages = ["Swift", "Obj-C"]
+        let segmentedControl = UISegmentedControl(items: languages)
+        
+        segmentedControl.setContentPositionAdjustment(.zero, forSegmentType: .any, barMetrics: .default)
+        segmentedControl.addTarget(self, action: #selector(updateLanguage), for: .valueChanged)
+        segmentedControl.selectedSegmentIndex = 0
+
+        segmentedControl.selectedSegmentTintColor = .interactiveColor
+        segmentedControl.translatesAutoresizingMaskIntoConstraints = false
+        
         return segmentedControl
     }()
 
@@ -64,18 +84,44 @@ class SynthViewController: UIViewController {
     // MARK: Selector Functions
     
     @objc private func updateOscillatorWaveform() {
-        let waveform = Waveform(rawValue: waveformSelectorSegmentedControl.selectedSegmentIndex)!
-        switch waveform {
-            case .sine: Synth.shared.setWaveformTo(Oscillator.sine)
-            case .triangle: Synth.shared.setWaveformTo(Oscillator.triangle)
-            case .sawtooth: Synth.shared.setWaveformTo(Oscillator.sawtooth)
-            case .square: Synth.shared.setWaveformTo(Oscillator.square)
-            case .whiteNoise: Synth.shared.setWaveformTo(Oscillator.whiteNoise)
+        switch languageSelected {
+        case .swift:
+            let waveform = Waveform(rawValue: waveformSelectorSegmentedControl.selectedSegmentIndex)!
+            switch waveform {
+                case .sine:         Synth.shared.setWaveformTo(Oscillator.sine)
+                case .triangle:     Synth.shared.setWaveformTo(Oscillator.triangle)
+                case .sawtooth:     Synth.shared.setWaveformTo(Oscillator.sawtooth)
+                case .square:       Synth.shared.setWaveformTo(Oscillator.square)
+                case .whiteNoise:   Synth.shared.setWaveformTo(Oscillator.whiteNoise)
+            }
+        case .objc:
+            let waveform = WaveFormOBJC(rawValue: waveformSelectorSegmentedControl.selectedSegmentIndex)!
+            switch waveform {
+            case .sine:         SynthOBJC.shared().setWaveformTo(OscillatorOBJC.sine())
+            case .triangle:     SynthOBJC.shared().setWaveformTo(OscillatorOBJC.triangle())
+            case .sawtooth:     SynthOBJC.shared().setWaveformTo(OscillatorOBJC.sawtooth())
+            case .square:       SynthOBJC.shared().setWaveformTo(OscillatorOBJC.square())
+            case .whiteNoise:   SynthOBJC.shared().setWaveformTo(OscillatorOBJC.whiteNoise())
+            @unknown default: fatalError("Case not handled: \(waveform.rawValue)")
+            }
         }
     }
     
+    @objc private func updateLanguage() {
+        guard let language = Language(rawValue: languageSelectorSegmentedControl.selectedSegmentIndex) else {
+            return
+        }
+        languageSelected = language
+        updateOscillatorWaveform()
+    }
+    
     @objc private func setPlaybackStateTo(_ state: Bool) {
-        Synth.shared.volume = state ? 0.5 : 0
+        switch languageSelected {
+        case .swift:
+            Synth.shared.volume = state ? 0.5 : 0
+        case .objc:
+            SynthOBJC.shared().volume = state ? 0.5 : 0
+        }
     }
     
     private func setUpView() {
@@ -84,7 +130,7 @@ class SynthViewController: UIViewController {
     }
     
     private func setUpSubviews() {
-        view.add(waveformSelectorSegmentedControl, parameterLabel)
+        view.add(waveformSelectorSegmentedControl, parameterLabel, languageSelectorSegmentedControl)
         
         NSLayoutConstraint.activate([
             waveformSelectorSegmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
@@ -92,16 +138,30 @@ class SynthViewController: UIViewController {
             waveformSelectorSegmentedControl.widthAnchor.constraint(equalToConstant: 250),
             
             parameterLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            parameterLabel.centerYAnchor.constraint(equalTo: waveformSelectorSegmentedControl.centerYAnchor)
+            parameterLabel.centerYAnchor.constraint(equalTo: waveformSelectorSegmentedControl.centerYAnchor),
+            
+            languageSelectorSegmentedControl.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
+            languageSelectorSegmentedControl.topAnchor.constraint(equalTo: waveformSelectorSegmentedControl.bottomAnchor, constant: 10),
         ])
     }
     
     private func setSynthParametersFrom(_ coord: CGPoint) {
-        Oscillator.amplitude = Float((view.bounds.height - coord.y) / view.bounds.height) 
-        Oscillator.frequency = Float(coord.x / view.bounds.width) * 1014 + 32
+        let amplitudePercent: Int
+        let frequencyHertz: Int
         
-        let amplitudePercent = Int(Oscillator.amplitude * 100)
-        let frequencyHertz = Int(Oscillator.frequency)
+        switch languageSelected {
+        case .swift:
+            Oscillator.amplitude = Float((view.bounds.height - coord.y) / view.bounds.height)
+            Oscillator.frequency = Float(coord.x / view.bounds.width) * 1014 + 32
+            amplitudePercent = Int(Oscillator.amplitude * 100)
+            frequencyHertz = Int(Oscillator.frequency)
+        case .objc:
+            OscillatorOBJC.setAmplitude(Float((view.bounds.height - coord.y) / view.bounds.height))
+            OscillatorOBJC.setFrequency(Float(coord.x / view.bounds.width) * 1014 + 32)
+            amplitudePercent = Int(OscillatorOBJC.amplitude() * 100)
+            frequencyHertz = Int(OscillatorOBJC.frequency())
+        }
+
         parameterLabel.text = "Frequency: \(frequencyHertz) Hz  Amplitude: \(amplitudePercent)%"
     }
 }
