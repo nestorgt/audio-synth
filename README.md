@@ -1,3 +1,21 @@
+# Results
+
+- Rewrite `Synth.swift` and `Oscillator.swift` in **Objective-C** and add it to this project ✅
+- Remove those two Swift files from the project and test it with your Obj-C implementation ✅
+
+> Added a switch in the UI to change between `Swift` & `Objective-C` implementation. This allows easier comparison.
+
+- They must work the same way as their counterpart in Swift ✅
+
+- Describe (not implement) how you would add the possibility to have 3 voices (synthesizers) at the same time ✅
+
+> The main problem right now is that both versions of Synth (`swift` & `objc`) are Singletons, so we can only have an instance of each. To have 3 voices I would remove the Singleton pattern from it, that way we can create N instances and save a reference to those.
+
+- Write a method in the `Synth.m` resp. `Synth.h` that informs the UI whenever audio is playing ✅
+
+- Display in the UI the String "Playing..." in some way when this method returns true, "" when it's false ✅
+
+
 # Coding challenge
 
 ## Introduction
@@ -11,8 +29,9 @@ responsible for creating the sound (with help from `Oscillator.swift`)
 
 ## Todo
 
-- Rewrite `Synth.swift` and `Oscillator.swift` in **Objective-C** and add it to this project
-- Remove those two Swift files from the project and test it with your Obj-C implementation 
+- Rewrite `Synth.swift` and `Oscillator.swift` in **Objective-C** and add it to this project ✅
+- Remove those two Swift files from the project and test it with your Obj-C implementation ✅
+> Added a switch in the UI to change between `Swift` & `Objective-C` implementation.
 - They must work the same way as their counterpart in Swift
 - Describe (not implement) how you would add the possibility to have 3 voices (synthesizers) at the same time
 
