@@ -33,7 +33,6 @@ responsible for creating the sound (with help from `Oscillator.swift`)
 
 - Rewrite `Synth.swift` and `Oscillator.swift` in **Objective-C** and add it to this project
 - Remove those two Swift files from the project and test it with your Obj-C implementation
-> Added a switch in the UI to change between `Swift` & `Objective-C` implementation.
 - They must work the same way as their counterpart in Swift
 - Describe (not implement) how you would add the possibility to have 3 voices (synthesizers) at the same time
 
