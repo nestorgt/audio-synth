@@ -17,6 +17,13 @@ class SynthViewController: UIViewController {
 
 		return label
     }()
+    
+    private lazy var isPlayingLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .white
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
         
     private lazy var waveformSelectorSegmentedControl: UISegmentedControl = {
         var images = [#imageLiteral(resourceName: "Sine Wave Icon"), #imageLiteral(resourceName: "Triangle Wave Icon"), #imageLiteral(resourceName: "Sawtooth Wave Icon"), #imageLiteral(resourceName: "Square Wave Icon"), #imageLiteral(resourceName: "Noise Wave Icon")]
@@ -62,6 +69,8 @@ class SynthViewController: UIViewController {
         
 		let coord = touch.location(in: view)
         setSynthParametersFrom(coord)
+        
+        updateIsPlayingLabel()
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -74,6 +83,8 @@ class SynthViewController: UIViewController {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         setPlaybackStateTo(false)
         parameterLabel.text = "Frequency: 0 Hz  Amplitude: 0%"
+        
+        updateIsPlayingLabel()
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -130,7 +141,7 @@ class SynthViewController: UIViewController {
     }
     
     private func setUpSubviews() {
-        view.add(waveformSelectorSegmentedControl, parameterLabel, languageSelectorSegmentedControl)
+        view.add(waveformSelectorSegmentedControl, parameterLabel, languageSelectorSegmentedControl, isPlayingLabel)
         
         NSLayoutConstraint.activate([
             waveformSelectorSegmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
@@ -142,6 +153,9 @@ class SynthViewController: UIViewController {
             
             languageSelectorSegmentedControl.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
             languageSelectorSegmentedControl.topAnchor.constraint(equalTo: waveformSelectorSegmentedControl.bottomAnchor, constant: 10),
+            
+            isPlayingLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            isPlayingLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
     }
     
@@ -163,5 +177,13 @@ class SynthViewController: UIViewController {
         }
 
         parameterLabel.text = "Frequency: \(frequencyHertz) Hz  Amplitude: \(amplitudePercent)%"
+    }
+    
+    private func updateIsPlayingLabel() {
+        if case languageSelected = Language.objc {
+            isPlayingLabel.text = SynthOBJC.shared().isPlaying() ? "Playing..." : nil
+        } else {
+            isPlayingLabel.text = nil
+        }
     }
 }
