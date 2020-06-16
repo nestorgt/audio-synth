@@ -15,10 +15,16 @@
 AVAudioEngine* audioEngine;
 AVAudioSourceNode* sourceNode;
 
+bool _isPlaying = false;
+- (bool)isPlaying {
+    return _isPlaying;
+}
+
 - (float)volume {
     return [[audioEngine mainMixerNode] outputVolume];
 }
 - (void)setVolume:(float)updateVolume {
+    _isPlaying = (updateVolume == 0) ? (false) : (true);
     [[audioEngine mainMixerNode] setOutputVolume: updateVolume];
 }
 

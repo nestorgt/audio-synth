@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) float volume;
 
 - (void)setWaveformTo:(Signal)signal;
+- (bool)isPlaying;
 
 @end
 
