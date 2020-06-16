@@ -12,8 +12,10 @@ typedef float (^Signal)(float);
 
 @interface OscillatorOBJC : NSObject
 
-+ (float)amplitude;
-+ (float)frequency;
++(float)amplitude;
++(void)setAmplitude:(float)amp;
++(float)frequency;
++(void)setFrequency:(float)freq;
 
 + (Signal)sine;
 + (Signal)triangle;

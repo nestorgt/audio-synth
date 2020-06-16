@@ -11,12 +11,24 @@
 
 @implementation OscillatorOBJC
 
-
 static float amplitude = 1;
 static float frequency = 440;
 
-+ (float)amplitude { return amplitude; }
-+ (float)frequency { return frequency; }
++ (float)amplitude {
+    return amplitude; 
+}
+
++ (void)setAmplitude:(float)amp {
+    amplitude = amp;
+}
+
++ (float)frequency {
+    return frequency;
+}
+
++(void)setFrequency:(float)freq {
+    frequency = freq;
+}
 
 + (Signal)sine {
     return ^(float time) {
@@ -26,7 +38,7 @@ static float frequency = 440;
 
 + (Signal)triangle {
     return ^(float time) {
-        double period = 1.0 / (double)[OscillatorOBJC amplitude];
+        double period = 1.0 / (double)[OscillatorOBJC frequency];
         double currentTime = fmod((double)time, period);
         
         double value = currentTime / period;
